@@ -17,7 +17,7 @@
     {
       "is_enabled": true,
       "min_limit": null,
-      "max_limit": 20,
+      "max_limit": 25,
       "out": "Sleep statement Check.You used {} sleep statements, should be between {} < {}",
       "indicator": "USED_THREAD_SLEEP"
     },

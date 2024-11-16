@@ -1,6 +1,8 @@
 package demo;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -82,15 +84,11 @@ public class TestCases {
         By searchBox = By.xpath("//input[@title='Search for Products, Brands and More']");
         Thread.sleep(3000);
         wrappers.enterText(searchBox, "Washing Machine");
-        Thread.sleep(2000);
         By searchButton = By.xpath("//button[@type='submit']");
         wrappers.click(searchButton);
-        Thread.sleep(3000);
-
         // Sort by Popularity
         By sortDropdown = By.xpath("//div[text()='Popularity']");
         wrappers.click(sortDropdown);
-        Thread.sleep(2000);
 
         // Retrieve all product ratings
         By ratingLocator = By.xpath("//div[@class='XQDdHH']");
@@ -109,60 +107,70 @@ public class TestCases {
 
     @Test
     public void testCase02() throws InterruptedException {
-        // Search for "iPhone"
-        Thread.sleep(3000);
-        By searchBox = By.xpath("//input[@title='Search for products, brands and more']");
-        Thread.sleep(3000);
-        WebElement searchBoxElement = driver.findElement(searchBox);
-        searchBoxElement.clear();
-        wrappers.enterText(searchBox, "iPhone");
-        Thread.sleep(3000);
-        By searchButton = By.xpath("//button[@type='submit']");
-        wrappers.click(searchButton);
-        Thread.sleep(3000);
+        try {
+            // Search for "iPhone"
 
-        // Retrieve all products with discounts
-        By productLocator = By.xpath("//div[contains(@class, 'UkUFwK') and .//span[contains(text(), '%')]]");
-        Thread.sleep(3000);
-        List<WebElement> products = wrappers.getElements(productLocator);
+            By searchBox = By.xpath("//input[@title='Search for products, brands and more']");
+            WebElement searchBoxElement = driver.findElement(searchBox);
+            searchBoxElement.sendKeys(Keys.CONTROL, "a");
+            searchBoxElement.sendKeys(Keys.DELETE);
+            wrappers.enterText(searchBox, "iPhone");
 
-        // Iterate through products and print titles and discounts > 17%
-        for (WebElement product : products) {
-            try {
-                String discountText = product.findElement(By.xpath(".//div[contains(@class, '_3Ay6Sb')]/span"))
-                        .getText();
-                int discount = Integer.parseInt(discountText.replaceAll("[^0-9]", ""));
-                if (discount > 17) {
-                    String title = product.findElement(By.xpath(".//div[contains(@class, 'WtfHe')]/a/div")).getText();
-                    System.out.println("Title: " + title);
-                    System.out.println("Discount: " + discount + "%");
+            By searchButton = By.xpath("//button[@type='submit']");
+            wrappers.click(searchButton);
+            Thread.sleep(3000);
+
+            // Retrieve all products with discounts
+            By productLocator = By.xpath("//div[contains(@class, 'UkUFwK') and .//span[contains(text(), '%')]]");
+            Thread.sleep(3000);
+            List<WebElement> products = wrappers.getElements(productLocator);
+
+            // Iterate through products and print titles and discounts > 17%
+            for (WebElement product : products) {
+                try {
+                    // Get discount percentage
+                    String discountText = product.findElement(By.xpath("//*[@id=\"container\"]/div/div[3]/div[1]/div[2]/div[6]/div/div/div/a/div[2]/div[2]/div[1]/div[1]/div[3]/span"))
+                            .getText();
+                    int discount = Integer.parseInt(discountText.replaceAll("[^0-9]", ""));
+
+                    // Check discount > 17%
+                    if (discount > 17) {
+                        // Get title
+                        String title = product.findElement(By.xpath("//*[@id=\"container\"]/div/div[3]/div[1]/div[2]/div[6]/div/div/div/a/div[2]/div[1]/div[1]")).getText();
+                        System.out.println("Title: " + title);
+                        System.out.println("Discount: " + discount + "%");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error processing product: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                // Skip products that don't match the criteria
             }
+        } catch (Exception e) {
+            System.out.println("Test failed due to error: " + e.getMessage());
         }
     }
 
     @Test
     public void testCase03() throws InterruptedException {
         // Search for "Coffee Mug"
-        Thread.sleep(3000);
+
         By searchBox = By.xpath("//input[@title='Search for products, brands and more']");
-        Thread.sleep(2000);
         WebElement searchBoxElement = driver.findElement(searchBox);
-        searchBoxElement.clear();
+        searchBoxElement.sendKeys(Keys.CONTROL, "a");
+        searchBoxElement.sendKeys(Keys.DELETE);
         wrappers.enterText(searchBox, "Coffee Mug");
-        Thread.sleep(2000);
         By searchButton = By.xpath("//button[@type='submit']");
-        Thread.sleep(2000);
+
         wrappers.click(searchButton);
-        Thread.sleep(5000);
+        Thread.sleep(4000);
 
         // Filter by 4 stars and above
-        By fourStarFilter = By.xpath("//*[@id=\"container\"]/div/div[3]/div[1]/div[1]/div/div/div/section[5]/div[2]/div/div[1]/div/label/div[1]");
-        Thread.sleep(3000);
+        By fourStarFilter = By
+                .xpath("//*[@id=\"container\"]/div/div[3]/div[1]/div[1]/div/div/div/section[5]/div[2]/div/div[1]");
+        Thread.sleep(5000);
+        WebElement element = driver.findElement(fourStarFilter);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
         wrappers.click(fourStarFilter);
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         // Retrieve all products with reviews
         By productLocator = By.xpath("//span[@class='Wphh3N']");
